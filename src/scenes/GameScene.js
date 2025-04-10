@@ -88,7 +88,8 @@ class GameScene extends Phaser.Scene {
             fire: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z),
             left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
             right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
-            down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
+            down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
+            pause: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
         };
 
         // An emitter for bricks when blocks are destroyed.
@@ -169,6 +170,16 @@ class GameScene extends Phaser.Scene {
             classType: Fire,
             maxSize: 10,
             runChildUpdate: false // Due to https://github.com/photonstorm/phaser/issues/3724
+        });
+
+        // Setup pause functionality
+        this.isPaused = false;
+        this.pauseText = this.add.bitmapText(this.sys.game.config.width / 2 - 40, this.sys.game.config.height / 2, 'font', 'PAUSED', 16);
+        this.pauseText.setScrollFactor(0);
+        this.pauseText.visible = false;
+        
+        this.keys.pause.on('down', () => {
+            this.togglePause();
         });
     }
 
@@ -620,6 +631,18 @@ class GameScene extends Phaser.Scene {
                 this[key] = null;
             }
         });
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        this.pauseText.visible = this.isPaused;
+        if (this.isPaused) {
+            this.physics.world.pause();
+            this.music.pause();
+        } else {
+            this.physics.world.resume();
+            this.music.resume();
+        }
     }
 }
 
